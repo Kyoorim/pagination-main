@@ -38,17 +38,52 @@ export const usePaginationContext = create<{
     set({
       pagination: {
         ...get().pagination,
+        currentPage: INITIAL_PAGE,
         pageSize: args.pageSize,
         totalItems: args.totalItems,
         totalPages,
-        nextEnabled: get().pagination.currentPage < totalPages,
-        previousEnabled: get().pagination.currentPage > 1,
+        nextEnabled: INITIAL_PAGE < totalPages,
+        previousEnabled: false,
       },
     });
   },
-  setNextPage: () => {},
-  setPrevPage: () => {},
-  setFirstPage: () => {},
+  setNextPage: () => {
+    const { currentPage, totalPages } = get().pagination;
+    if (currentPage < totalPages) {
+      set({
+        pagination: {
+          ...get().pagination,
+          currentPage: currentPage + 1,
+          nextEnabled: currentPage + 1 < totalPages,
+          previousEnabled: currentPage + 1 > 1,
+        },
+      });
+    }
+  },
+  setPrevPage: () => {
+    const { currentPage, totalPages } = get().pagination;
+    if (currentPage > 1) {
+      set({
+        pagination: {
+          ...get().pagination,
+          currentPage: currentPage - 1,
+          nextEnabled: currentPage - 1 < totalPages,
+          previousEnabled: currentPage - 1 > 1,
+        },
+      });
+    }
+  },
+  setFirstPage: () => {
+    const { totalPages } = get().pagination;
+    set({
+      pagination: {
+        ...get().pagination,
+        currentPage: 1,
+        nextEnabled: totalPages > 1,
+        previousEnabled: false,
+      },
+    });
+  },
 }));
 
 export interface ListContextProps {

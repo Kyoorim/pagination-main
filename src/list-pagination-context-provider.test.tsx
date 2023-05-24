@@ -6,9 +6,10 @@ import ListPaginationContextProvider, { usePaginationContext } from './list-pagi
 
 describe('ListPaginationContextProvider', () => {
   const NaiveList = (props) => {
-    const { pagination, setNextPage } = usePaginationContext();
+    const { pagination, setNextPage, setPrevPage } = usePaginationContext();
     return (
       <div>
+        {pagination.previousEnabled && <button onClick={setPrevPage}>Go to previous page</button>}
         <span>{`currentPage: ${pagination.currentPage}`}</span>
         <span>{`totalPages: ${pagination.totalPages}`}</span>
         <span>{`pageSize: ${pagination.pageSize}`}</span>
@@ -35,7 +36,7 @@ describe('ListPaginationContextProvider', () => {
     expect(getByText('view more')).not.toBeNull();
   });
 
-  it('should return currentPage, totalPages, pageSize and view more button', () => {
+  it('should update pagination state when clicking "view more" button', () => {
     const { getByText } = render(
       <ListPaginationContextProvider
         value={{
@@ -53,5 +54,25 @@ describe('ListPaginationContextProvider', () => {
     expect(getByText('totalPages: 3')).not.toBeNull();
     expect(getByText('pageSize: 2')).not.toBeNull();
     expect(screen.queryByText('view more')).not.toBeNull();
+  });
+
+  it('should go to the previous page when setPrevPage is called', () => {
+    const { getByText } = render(
+      <ListPaginationContextProvider
+        value={{
+          total: 6,
+          perPage: 2,
+        }}
+      >
+        <NaiveList />
+      </ListPaginationContextProvider>,
+    );
+
+    fireEvent.click(getByText('Go to previous page'));
+
+    expect(getByText('currentPage: 1')).not.toBeNull();
+    expect(getByText('totalPages: 3')).not.toBeNull();
+    expect(getByText('pageSize: 2')).not.toBeNull();
+    expect(getByText('view more')).not.toBeNull();
   });
 });

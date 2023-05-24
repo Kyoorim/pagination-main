@@ -20,7 +20,7 @@ const INITIAL_PAGE = 1;
 
 export const usePaginationContext = create<{
   pagination: Pagination;
-  setPagination: (pg: Pagination) => void;
+  setPagination: (pg: PaginationArgs) => void;
   setNextPage: () => void;
   setPrevPage: () => void;
   setFirstPage: () => void;
@@ -50,25 +50,27 @@ export const usePaginationContext = create<{
   setNextPage: () => {
     const { currentPage, totalPages } = get().pagination;
     if (currentPage < totalPages) {
+      const nextPage = currentPage + 1;
       set({
         pagination: {
           ...get().pagination,
-          currentPage: currentPage + 1,
-          nextEnabled: currentPage + 1 < totalPages,
-          previousEnabled: currentPage + 1 > 1,
+          currentPage: nextPage,
+          nextEnabled: nextPage < totalPages,
+          previousEnabled: true,
         },
       });
     }
   },
   setPrevPage: () => {
-    const { currentPage, totalPages } = get().pagination;
-    if (currentPage > 1) {
+    const { currentPage } = get().pagination;
+    if (currentPage > INITIAL_PAGE) {
+      const prevPage = currentPage - 1;
       set({
         pagination: {
           ...get().pagination,
-          currentPage: currentPage - 1,
-          nextEnabled: currentPage - 1 < totalPages,
-          previousEnabled: currentPage - 1 > 1,
+          currentPage: prevPage,
+          nextEnabled: true,
+          previousEnabled: prevPage > 1,
         },
       });
     }
@@ -78,8 +80,8 @@ export const usePaginationContext = create<{
     set({
       pagination: {
         ...get().pagination,
-        currentPage: 1,
-        nextEnabled: totalPages > 1,
+        currentPage: INITIAL_PAGE,
+        nextEnabled: totalPages > INITIAL_PAGE,
         previousEnabled: false,
       },
     });

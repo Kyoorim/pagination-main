@@ -9,7 +9,7 @@ describe('ListPaginationContextProvider', () => {
     const { pagination, setNextPage, setPrevPage } = usePaginationContext();
     return (
       <div>
-        {pagination.previousEnabled && <button onClick={setPrevPage}>previous page</button>}
+        {pagination.previousEnabled ? <button onClick={setPrevPage}>previous page</button> : ''}
         <span>{`currentPage: ${pagination.currentPage}`}</span>
         <span>{`totalPages: ${pagination.totalPages}`}</span>
         <span>{`pageSize: ${pagination.pageSize}`}</span>
@@ -74,6 +74,25 @@ describe('ListPaginationContextProvider', () => {
 
     expect(getByText('currentPage: 1')).not.toBeNull();
     expect(getByText('totalPages: 4')).not.toBeNull();
+    expect(getByText('pageSize: 2')).not.toBeNull();
+    expect(getByText('next page')).not.toBeNull();
+    expect(screen.queryByText('previous page')).toBeNull();
+  });
+
+  it('should disable the previous button when current page is first page', () => {
+    const { getByText } = render(
+      <ListPaginationContextProvider
+        value={{
+          total: 6,
+          perPage: 2,
+        }}
+      >
+        <NaiveList />
+      </ListPaginationContextProvider>,
+    );
+
+    expect(getByText('currentPage: 1')).not.toBeNull();
+    expect(getByText('totalPages: 3')).not.toBeNull();
     expect(getByText('pageSize: 2')).not.toBeNull();
     expect(getByText('next page')).not.toBeNull();
     expect(screen.queryByText('previous page')).toBeNull();

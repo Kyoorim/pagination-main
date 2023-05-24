@@ -9,11 +9,11 @@ describe('ListPaginationContextProvider', () => {
     const { pagination, setNextPage, setPrevPage } = usePaginationContext();
     return (
       <div>
-        {pagination.previousEnabled && <button onClick={setPrevPage}>Go to previous page</button>}
+        {pagination.previousEnabled && <button onClick={setPrevPage}>previous page</button>}
         <span>{`currentPage: ${pagination.currentPage}`}</span>
         <span>{`totalPages: ${pagination.totalPages}`}</span>
         <span>{`pageSize: ${pagination.pageSize}`}</span>
-        {pagination.nextEnabled && <button onClick={setNextPage}>view more</button>}
+        {pagination.nextEnabled && <button onClick={setNextPage}>next page</button>}
       </div>
     );
   };
@@ -33,7 +33,7 @@ describe('ListPaginationContextProvider', () => {
     expect(getByText('currentPage: 1')).not.toBeNull();
     expect(getByText('totalPages: 2')).not.toBeNull();
     expect(getByText('pageSize: 2')).not.toBeNull();
-    expect(getByText('view more')).not.toBeNull();
+    expect(getByText('next page')).not.toBeNull();
   });
 
   it('should update pagination state when clicking "view more" button', () => {
@@ -48,19 +48,19 @@ describe('ListPaginationContextProvider', () => {
       </ListPaginationContextProvider>,
     );
 
-    fireEvent.click(getByText('view more'));
+    fireEvent.click(getByText('next page'));
 
     expect(getByText('currentPage: 2')).not.toBeNull();
     expect(getByText('totalPages: 3')).not.toBeNull();
     expect(getByText('pageSize: 2')).not.toBeNull();
-    expect(screen.queryByText('view more')).not.toBeNull();
+    expect(screen.queryByText('next page')).not.toBeNull();
   });
 
   it('should go to the previous page when setPrevPage is called', () => {
     const { getByText } = render(
       <ListPaginationContextProvider
         value={{
-          total: 6,
+          total: 7,
           perPage: 2,
         }}
       >
@@ -68,11 +68,14 @@ describe('ListPaginationContextProvider', () => {
       </ListPaginationContextProvider>,
     );
 
-    fireEvent.click(getByText('Go to previous page'));
+    fireEvent.click(getByText('next page'));
+
+    fireEvent.click(getByText('previous page'));
 
     expect(getByText('currentPage: 1')).not.toBeNull();
-    expect(getByText('totalPages: 3')).not.toBeNull();
+    expect(getByText('totalPages: 4')).not.toBeNull();
     expect(getByText('pageSize: 2')).not.toBeNull();
-    expect(getByText('view more')).not.toBeNull();
+    expect(getByText('next page')).not.toBeNull();
+    expect(screen.queryByText('previous page')).toBeNull();
   });
 });

@@ -71,6 +71,7 @@ export const usePaginationContext = create<{
           currentPage: prevPage,
           nextEnabled: true,
           previousEnabled: prevPage > 1,
+          // previousEnabled: true,
         },
       });
     }

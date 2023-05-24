@@ -1,4 +1,5 @@
 import React from 'react';
+import { create } from 'zustand';
 
 type PaginationState = {
   totalItems: number;
@@ -19,8 +20,9 @@ const INITIAL_PAGE = 1;
 
 export const usePaginationContext = create<{
   pagination: Pagination;
-  setPagination: (pg: Pagination) => void;
+  setPagination: (pg: PaginationArgs) => void;
   setNextPage: () => void;
+  setPrevPage: () => void;
   setFirstPage: () => void;
 }>((set, get) => ({
   pagination: {
@@ -31,10 +33,60 @@ export const usePaginationContext = create<{
     previousEnabled: false,
     totalItems: 0,
   },
-  setPagination: (args: PaginationArgs) => {},
-  setNextPage: () => {},
-  setPrevPage: () => {},
-  setFirstPage: () => {},
+  setPagination: (args: PaginationArgs) => {
+    const totalPages = Math.ceil(args.totalItems / args.pageSize);
+    set({
+      pagination: {
+        ...get().pagination,
+        currentPage: INITIAL_PAGE,
+        pageSize: args.pageSize,
+        totalItems: args.totalItems,
+        totalPages,
+        nextEnabled: INITIAL_PAGE < totalPages,
+        previousEnabled: false,
+      },
+    });
+  },
+  setNextPage: () => {
+    const { currentPage, totalPages } = get().pagination;
+    if (currentPage < totalPages) {
+      const nextPage = currentPage + 1;
+      set({
+        pagination: {
+          ...get().pagination,
+          currentPage: nextPage,
+          nextEnabled: nextPage < totalPages,
+          previousEnabled: true,
+        },
+      });
+    }
+  },
+  setPrevPage: () => {
+    const { currentPage } = get().pagination;
+    if (currentPage > INITIAL_PAGE) {
+      const prevPage = currentPage - 1;
+      set({
+        pagination: {
+          ...get().pagination,
+          currentPage: prevPage,
+          nextEnabled: true,
+          previousEnabled: prevPage > 1,
+          // previousEnabled: true,
+        },
+      });
+    }
+  },
+  setFirstPage: () => {
+    const { totalPages } = get().pagination;
+    set({
+      pagination: {
+        ...get().pagination,
+        currentPage: INITIAL_PAGE,
+        nextEnabled: totalPages > INITIAL_PAGE,
+        previousEnabled: false,
+      },
+    });
+  },
 }));
 
 export interface ListContextProps {
